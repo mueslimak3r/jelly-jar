@@ -2,9 +2,9 @@
 __pycache__/
 *.py[cod]
 *.json
-*.txt
 *.DS_STORE
 .vscode
 cred.json
 venv
+*Jelly-Find-uuid.txt
 config/data
