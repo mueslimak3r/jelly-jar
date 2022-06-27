@@ -1,12 +1,13 @@
 import copy
 
+
 def get_user_id(client=None, username=''):
     if client is None or username == '':
         return
     try:
         users = client.jellyfin.get_users()
         for user in users:
-            if not 'Name' in user:
+            if 'Name' not in user:
                 continue
             if user['Name'] == username:
                 print('matched id for username %s' % username)
@@ -15,6 +16,7 @@ def get_user_id(client=None, username=''):
         print(err)
         return ''
     return ''
+
 
 def query_items(client=None, userId=None, limit=100, startIndex=0, includeItemTypes=('Episode'), fields=('ProviderIds', 'UserData')):
     if client is None:
@@ -62,7 +64,8 @@ def query_items(client=None, userId=None, limit=100, startIndex=0, includeItemTy
         return []
     return items
 
-def get_items(client=None,userId=None, includeItemTypes=('Episode')):
+
+def get_items(client=None, userId=None, includeItemTypes=('Episode')):
     if client is None:
         return []
     
@@ -78,8 +81,10 @@ def get_items(client=None,userId=None, includeItemTypes=('Episode')):
             items.extend(newItems)
     return items
 
+
 def get_episodes(client=None, userId=None):
     return get_items(client=client, userId=userId, includeItemTypes=('Episode'))
+
 
 def get_movies(client=None, userId=None):
     return get_items(client=client, userId=userId, includeItemTypes=('Movie'))

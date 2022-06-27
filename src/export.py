@@ -59,12 +59,13 @@ def query_jellyfin(username=''):
     jellyfin_logout()
     return items
 
+
 def dump_json(items=None, timestamp='', username=''):
     if items is None or timestamp == '' or username == '':
         return
     path = data_path / 'backups' / replace(username)
     Path(path).mkdir(parents=True, exist_ok=True)
-    with Path(path /  (timestamp + '-' + replace(username) + '.json')).open('w+') as json_file:
+    with Path(path / (timestamp + '-' + replace(username) + '.json')).open('w+') as json_file:
         json.dump(items, json_file, indent=4)
 
 
@@ -99,7 +100,7 @@ def main(argv):
             usernames = arg.split(',')
     
     if not usernames:
-        usernames = [ server_username ]
+        usernames = [server_username]
 
     if server_url == '' or server_username == '' or server_password == '':
         print_debug(['you need to export env variables: JELLYFIN_URL, JELLYFIN_USERNAME, JELLYFIN_PASSWORD\n'])
