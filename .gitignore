@@ -1,0 +1,10 @@
+.idea
+__pycache__/
+*.py[cod]
+*.json
+*.txt
+*.DS_STORE
+.vscode
+cred.json
+venv
+config/data
