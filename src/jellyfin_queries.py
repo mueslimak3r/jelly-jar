@@ -1,5 +1,4 @@
 import copy
-import json
 from jellyfin_api_client import jellyfin_login, jellyfin_logout
 
 
@@ -93,17 +92,20 @@ def get_episodes(client=None, userId=None):
 def get_movies(client=None, userId=None):
     return get_items(client=client, userId=userId, includeItemTypes=('Movie'))
 
+
 def update_item(client, userId, matchedItem, data_item):
     if matchedItem is None or data_item is None or client is None:
         return
-    if data_item['UserData']['Played'] == True and matchedItem['UserData']['Played'] == False:
+    if data_item['UserData']['Played'] is True and matchedItem['UserData']['Played'] is False:
         request_for_user(client, userId, '%s/%s' % ('PlayedItems', matchedItem['Id']))
-    if data_item['UserData']['IsFavorite'] == True:
+    if data_item['UserData']['IsFavorite'] is True:
         request_for_user(client, userId, '%s/%s' % ('FavoriteItems', matchedItem['Id']))
+
 
 def request_for_user(client, userId, path, json=None, params=None):
     client.jellyfin._post("Users/%s/%s" % (userId, path), json=json, params=params)
-    
+
+
 def query_jellyfin(username='', server_url='', server_username='', server_password=''):
     if username == '' or server_url == '' or server_username == '' or server_password == '':
         print('missing server info')

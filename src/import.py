@@ -39,8 +39,8 @@ def sync_to_jellyfin(items, data_backup, client, userId, log_file):
     if items is None:
         return
 
-    print_debug(a=["found %d items in jellyfin" % len(items)], log_file=log_file)
-    print_debug(a=["found %d items in backup" % len(data_backup)], log_file=log_file)
+    print_debug(a=["found %d items in jellyfin" % len(items['Items'])], log_file=log_file)
+    print_debug(a=["found %d items in backup" % len(data_backup['Items'])], log_file=log_file)
 
     matched_items = 0
     for data_item in data_backup['Items']:
@@ -55,7 +55,7 @@ def sync_to_jellyfin(items, data_backup, client, userId, log_file):
             # print_debug(a=["found item that is in backup and in jellyfin: %s" % data_item['Name']], log_file=log_file)
             jellyfin_queries.update_item(client, userId, matchedItem, data_item)
 
-    print_debug(a=["found %d items in backup but not in jellyfin and have different data" % matched_items], log_file=log_file)
+    print_debug(a=["matched %d items from backup" % matched_items], log_file=log_file)
 
 
 def import_user_data(username, server_url, server_username, server_password, data_backup=None, log_file=False):
