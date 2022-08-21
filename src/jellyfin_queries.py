@@ -1,4 +1,6 @@
 import copy
+import json
+from jellyfin_api_client import jellyfin_login, jellyfin_logout
 
 
 def get_user_id(client=None, username=''):
@@ -43,7 +45,7 @@ def query_items(client=None, userId=None, limit=100, startIndex=0, includeItemTy
             'UserId': userId,
             'Recursive': True,
             'includeItemTypes': includeItemTypes,
-            'SortBy': 'DateCreated,SortName',
+            'SortBy': 'DateCreated,SortName,Type,Id',
             'SortOrder': 'Ascending',
             'enableImages': False,
             'enableUserData': True,
@@ -56,6 +58,8 @@ def query_items(client=None, userId=None, limit=100, startIndex=0, includeItemTy
             for item in result['Items']:
                 newItem = {}
                 newItem['Name'] = item['Name']
+                newItem['Id'] = item['Id']
+                newItem['Type'] = copy.deepcopy(item['Type'])
                 newItem['ProviderIds'] = copy.deepcopy(item['ProviderIds'])
                 newItem['UserData'] = copy.deepcopy(item['UserData'])
                 items.append(newItem)
@@ -88,3 +92,32 @@ def get_episodes(client=None, userId=None):
 
 def get_movies(client=None, userId=None):
     return get_items(client=client, userId=userId, includeItemTypes=('Movie'))
+
+def update_item(client, userId, matchedItem, data_item):
+    if matchedItem is None or data_item is None or client is None:
+        return
+    if data_item['UserData']['Played'] == True and matchedItem['UserData']['Played'] == False:
+        request_for_user(client, userId, '%s/%s' % ('PlayedItems', matchedItem['Id']))
+    if data_item['UserData']['IsFavorite'] == True:
+        request_for_user(client, userId, '%s/%s' % ('FavoriteItems', matchedItem['Id']))
+
+def request_for_user(client, userId, path, json=None, params=None):
+    client.jellyfin._post("Users/%s/%s" % (userId, path), json=json, params=params)
+    
+def query_jellyfin(username='', server_url='', server_username='', server_password=''):
+    if username == '' or server_url == '' or server_username == '' or server_password == '':
+        print('missing server info')
+        return
+
+    client = jellyfin_login(server_url, server_username, server_password, "Jelly Find")
+    userId = get_user_id(client, username)
+    items = {}
+    items['User'] = username
+    items['Items'] = []
+    episodes = get_episodes(client, userId)
+    movies = get_movies(client, userId)
+    items['Items'].extend(episodes)
+    items['Items'].extend(movies)
+    print('user %s has %s episodes, %s movies' % (username, len(episodes), len(movies)))
+    jellyfin_logout()
+    return items

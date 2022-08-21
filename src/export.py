@@ -8,7 +8,6 @@ import json
 
 from pathlib import Path
 from datetime import datetime
-from jellyfin_api_client import jellyfin_login, jellyfin_logout
 
 server_url = os.environ['JELLYFIN_URL'] if 'JELLYFIN_URL' in os.environ else ''
 server_username = os.environ['JELLYFIN_USERNAME'] if 'JELLYFIN_USERNAME' in os.environ else ''
@@ -41,25 +40,6 @@ def replace(s):
     return re.sub('[^A-Za-z0-9]+', '', s)
 
 
-def query_jellyfin(username=''):
-    if username == '' or server_url == '' or server_username == '' or server_password == '':
-        print_debug(a=['missing server info'])
-        return
-
-    client = jellyfin_login(server_url, server_username, server_password, "Jelly Find")
-    userId = jellyfin_queries.get_user_id(client, username)
-    items = {}
-    items['User'] = username
-    items['Items'] = []
-    episodes = jellyfin_queries.get_episodes(client, userId)
-    movies = jellyfin_queries.get_movies(client, userId)
-    items['Items'].extend(episodes)
-    items['Items'].extend(movies)
-    print_debug(a=['user %s has %s episodes, %s movies' % (username, len(episodes), len(movies))])
-    jellyfin_logout()
-    return items
-
-
 def dump_json(items=None, timestamp='', username=''):
     if items is None or timestamp == '' or username == '':
         return
@@ -74,7 +54,7 @@ def export(username='', log_file=False):
     print_debug(a=["\nstarted new session at %s\n" % start])
     print_debug(a=["trying to export data for user [%s]\n" % username])
 
-    items = query_jellyfin(username)
+    items = jellyfin_queries.query_jellyfin(username, server_url, server_username, server_password)
     dump_json(items, session_timestamp, username)
     end = datetime.now()
     print_debug(a=["total runtime: " + str(end - start)], log_file=log_file)
